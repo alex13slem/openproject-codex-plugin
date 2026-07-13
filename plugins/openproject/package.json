@@ -11,13 +11,17 @@
   "homepage": "https://github.com/alex13slem/openproject-codex-plugin#readme",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "check": "bun run typecheck && bun run test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@types/bun": "1.3.14",
     "@types/node": "24.10.0",
     "typescript": "5.9.3"
   }

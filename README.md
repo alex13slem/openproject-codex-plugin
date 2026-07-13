@@ -1,8 +1,14 @@
 # OpenProject for Codex
 
+<p align="center">
+  <img src="assets/banner.svg" alt="OpenProject for Codex" width="100%">
+</p>
+
 [![CI](https://github.com/alex13slem/openproject-codex-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/alex13slem/openproject-codex-plugin/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/alex13slem/openproject-codex-plugin)](https://github.com/alex13slem/openproject-codex-plugin/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![OpenProject API v3](https://img.shields.io/badge/OpenProject-API%20v3-1A67A3)](https://www.openproject.org/docs/api/)
+[![GitHub stars](https://img.shields.io/github/stars/alex13slem/openproject-codex-plugin?style=flat)](https://github.com/alex13slem/openproject-codex-plugin/stargazers)
 
 An unofficial Codex plugin and MCP server for managing OpenProject work without
 leaving your coding workflow.
@@ -15,6 +21,20 @@ leaving your coding workflow.
 - Update subjects, descriptions, assignees, priorities, and statuses.
 - Add Markdown comments to work packages.
 - Guide Codex toward safe, explicit OpenProject write operations.
+
+## Example workflow
+
+```text
+You:   Find checkout-related tasks in the Storefront project.
+Codex: I found #142 "Handle expired checkout sessions" and
+       #157 "Add payment retry telemetry".
+
+You:   Add a comment to #142 saying the API fix is ready for review.
+Codex: Added the comment to work package #142.
+```
+
+Codex resolves the request through MCP tools, while OpenProject remains the
+source of truth for permissions and work-package state.
 
 ## Requirements
 
@@ -87,15 +107,47 @@ The repository includes a plugin manifest and a marketplace definition at
 support can add the repository as a local marketplace. The installation script
 is the portable fallback when only MCP configuration is available.
 
+## Documentation
+
+- [Architecture and security boundaries](docs/architecture.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Roadmap](ROADMAP.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+
 ## Development
 
 ```bash
 cd plugins/openproject
 bun install --frozen-lockfile
-bun run typecheck
+bun run check
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+Generate a local coverage report with:
+
+```bash
+bun run test:coverage
+```
+
+The API module is covered by tests for request authentication, HAL collection
+handling, search filters, update payloads, and error responses. See
+[CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+## Project layout
+
+```text
+plugins/openproject/
+├── .codex-plugin/plugin.json   # Plugin metadata
+├── .mcp.json                   # MCP process definition
+├── scripts/
+│   ├── server.ts               # MCP tools and orchestration
+│   └── openproject-api.ts      # Tested API client and payload helpers
+├── skills/openproject/         # Codex workflow guidance
+└── tests/                      # Bun unit tests
+```
+
+Planned work is tracked in the [v0.2.0 roadmap](ROADMAP.md). Contributions and
+well-scoped feature proposals are welcome.
 
 ## Uninstall
 

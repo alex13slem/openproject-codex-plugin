@@ -11,7 +11,7 @@ change so the approach can be discussed first.
    ```bash
    cd plugins/openproject
    bun install --frozen-lockfile
-   bun run typecheck
+   bun run check
    ```
 
 3. Check shell scripts from the repository root:
@@ -29,5 +29,6 @@ URLs in commits, issues, logs, or screenshots.
 - Keep each pull request focused.
 - Explain user-visible behavior and validation steps.
 - Add or update documentation when behavior changes.
+- Add tests for request-building and API behavior changes.
 - Use Conventional Commits, for example `feat: add status lookup` or
   `fix: preserve work package lock version`.

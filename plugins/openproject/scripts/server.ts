@@ -4,17 +4,14 @@ import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-
-type HalLink = { href?: string | null; title?: string };
-type HalResource = Record<string, unknown> & {
-  id?: number;
-  subject?: string;
-  name?: string;
-  identifier?: string;
-  lockVersion?: number;
-  _links?: Record<string, HalLink | HalLink[]>;
-  _embedded?: { elements?: HalResource[] };
-};
+import {
+  buildWorkPackageSearchPath,
+  buildWorkPackageUpdatePayload,
+  compact,
+  createOpenProjectApi,
+  elements,
+  type HalLink,
+} from "./openproject-api.js";
 
 const envFile =
   process.env.OPENPROJECT_ENV_FILE ??
@@ -48,53 +45,11 @@ if (!baseUrl || !apiToken) {
     `OPENPROJECT_URL and OPENPROJECT_API_TOKEN are required in ${envFile}`,
   );
 }
-
-async function api<T extends HalResource>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    headers: {
-      Accept: "application/hal+json",
-      Authorization: `Bearer ${apiToken}`,
-      ...(init.body ? { "Content-Type": "application/json" } : {}),
-      ...init.headers,
-    },
-  });
-  const text = await response.text();
-  let body: unknown = text;
-  try {
-    body = text ? JSON.parse(text) : {};
-  } catch {
-    // Preserve a non-JSON error response for diagnostics.
-  }
-  if (!response.ok) {
-    throw new Error(
-      `OpenProject HTTP ${response.status}: ${JSON.stringify(body).slice(0, 2000)}`,
-    );
-  }
-  return body as T;
-}
+const api = createOpenProjectApi(baseUrl, apiToken);
 
 function result(value: unknown) {
   return {
     content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }],
-  };
-}
-
-function elements(resource: HalResource): HalResource[] {
-  return resource._embedded?.elements ?? [];
-}
-
-function compact(resource: HalResource): Record<string, unknown> {
-  return {
-    id: resource.id,
-    name: resource.name,
-    identifier: resource.identifier,
-    subject: resource.subject,
-    lockVersion: resource.lockVersion,
-    links: resource._links,
   };
 }
 
@@ -152,14 +107,8 @@ server.registerTool(
     annotations: { readOnlyHint: true },
   },
   async ({ query, projectId, pageSize }) => {
-    const filters: Record<string, unknown>[] = [];
-    if (query) filters.push({ subject: { operator: "~", values: [query] } });
-    if (projectId) {
-      filters.push({ project: { operator: "=", values: [String(projectId)] } });
-    }
-    const params = new URLSearchParams({ pageSize: String(pageSize) });
-    if (filters.length) params.set("filters", JSON.stringify(filters));
-    const collection = await api(`/api/v3/work_packages?${params}`);
+    const path = buildWorkPackageSearchPath({ query, projectId, pageSize });
+    const collection = await api(path);
     return result(elements(collection).map(compact));
   },
 );
@@ -225,24 +174,16 @@ server.registerTool(
   },
   async ({ id, subject, description, assigneeId, priorityId, statusId }) => {
     const current = await api(`/api/v3/work_packages/${id}`);
-    const links: Record<string, HalLink> = {};
-    if (assigneeId !== undefined) {
-      links.assignee = {
-        href: assigneeId ? `/api/v3/users/${assigneeId}` : null,
-      };
-    }
-    if (priorityId) links.priority = { href: `/api/v3/priorities/${priorityId}` };
-    if (statusId) links.status = { href: `/api/v3/statuses/${statusId}` };
+    const body = buildWorkPackageUpdatePayload(current.lockVersion, {
+      subject,
+      description,
+      assigneeId,
+      priorityId,
+      statusId,
+    });
     const updated = await api(`/api/v3/work_packages/${id}`, {
       method: "PATCH",
-      body: JSON.stringify({
-        lockVersion: current.lockVersion,
-        ...(subject !== undefined ? { subject } : {}),
-        ...(description !== undefined
-          ? { description: { format: "markdown", raw: description } }
-          : {}),
-        ...(Object.keys(links).length ? { _links: links } : {}),
-      }),
+      body: JSON.stringify(body),
     });
     return result(updated);
   },
