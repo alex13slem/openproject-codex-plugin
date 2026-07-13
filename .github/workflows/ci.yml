@@ -28,6 +28,10 @@ jobs:
         working-directory: plugins/openproject
         run: bun run typecheck
 
+      - name: Test
+        working-directory: plugins/openproject
+        run: bun run test
+
       - name: Check shell syntax
         run: bash -n scripts/install.sh scripts/uninstall.sh
 
