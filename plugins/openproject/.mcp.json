@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "openproject": {
+      "type": "stdio",
+      "command": "bun",
+      "args": ["scripts/server.ts"]
+    }
+  }
+}

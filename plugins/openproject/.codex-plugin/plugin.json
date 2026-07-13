@@ -1,0 +1,24 @@
+{
+  "name": "openproject",
+  "version": "0.1.0",
+  "description": "Manage OpenProject work packages from Codex",
+  "author": {
+    "name": "alex13slem"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "OpenProject",
+    "shortDescription": "Manage projects and work packages.",
+    "longDescription": "Search, create, update, and comment on work packages in an OpenProject instance.",
+    "developerName": "alex13slem",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/alex13slem/openproject-codex-plugin",
+    "defaultPrompt": [
+      "Show my active OpenProject tasks.",
+      "Create an OpenProject task for this change.",
+      "Update the related OpenProject work package."
+    ]
+  }
+}

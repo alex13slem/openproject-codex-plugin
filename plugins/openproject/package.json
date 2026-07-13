@@ -1,0 +1,24 @@
+{
+  "name": "openproject-codex-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Codex plugin and MCP server for OpenProject API v3",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alex13slem/openproject-codex-plugin.git"
+  },
+  "homepage": "https://github.com/alex13slem/openproject-codex-plugin#readme",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.0",
+    "typescript": "5.9.3"
+  }
+}
