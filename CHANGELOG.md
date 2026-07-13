@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The project follows
 
 ### Added
 
+- Work-package filters for assignee, current user, exact due date, and status.
+- Compact work-package search results with scheduling and progress fields.
 - Unit tests for authentication headers, API errors, HAL resources, filters,
   and optimistic-lock update payloads.
 - Architecture, troubleshooting, and roadmap documentation.

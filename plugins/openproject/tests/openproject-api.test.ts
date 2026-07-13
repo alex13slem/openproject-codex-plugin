@@ -3,6 +3,7 @@ import {
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
   compact,
+  compactWorkPackage,
   createOpenProjectApi,
   elements,
 } from "../scripts/openproject-api.js";
@@ -97,6 +98,36 @@ describe("HAL helpers", () => {
       links: { self: { href: "/api/v3/work_packages/7" } },
     });
   });
+
+  test("compacts a work package without returning every HAL action link", () => {
+    expect(
+      compactWorkPackage({
+        id: 8,
+        subject: "Due today",
+        startDate: "2026-07-12",
+        dueDate: "2026-07-13",
+        percentageDone: 25,
+        _links: {
+          project: { href: "/api/v3/projects/2", title: "ERP" },
+          status: { href: "/api/v3/statuses/7", title: "In progress" },
+          assignee: { href: "/api/v3/users/4", title: "Alex" },
+          update: { href: "/api/v3/work_packages/8/form" },
+        },
+      }),
+    ).toEqual({
+      id: 8,
+      subject: "Due today",
+      startDate: "2026-07-12",
+      dueDate: "2026-07-13",
+      percentageDone: 25,
+      project: { href: "/api/v3/projects/2", title: "ERP" },
+      type: null,
+      status: { href: "/api/v3/statuses/7", title: "In progress" },
+      priority: null,
+      assignee: { href: "/api/v3/users/4", title: "Alex" },
+      self: null,
+    });
+  });
 });
 
 describe("work package request builders", () => {
@@ -113,6 +144,34 @@ describe("work package request builders", () => {
     expect(JSON.parse(url.searchParams.get("filters") ?? "[]")).toEqual([
       { subject: { operator: "~", values: ["checkout flow"] } },
       { project: { operator: "=", values: ["12"] } },
+    ]);
+  });
+
+  test("encodes assignee, due date, and open status filters", () => {
+    const path = buildWorkPackageSearchPath({
+      assigneeId: 7,
+      dueDate: "2026-07-13",
+      statusCategory: "open",
+      pageSize: 50,
+    });
+    const url = new URL(path, "https://tasks.example.com");
+
+    expect(JSON.parse(url.searchParams.get("filters") ?? "[]")).toEqual([
+      { assignee: { operator: "=", values: ["7"] } },
+      { dueDate: { operator: "=d", values: ["2026-07-13"] } },
+      { status: { operator: "o", values: [] } },
+    ]);
+  });
+
+  test("encodes an exact status ID", () => {
+    const path = buildWorkPackageSearchPath({
+      statusId: 4,
+      pageSize: 50,
+    });
+    const url = new URL(path, "https://tasks.example.com");
+
+    expect(JSON.parse(url.searchParams.get("filters") ?? "[]")).toEqual([
+      { status: { operator: "=", values: ["4"] } },
     ]);
   });
 

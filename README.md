@@ -90,7 +90,7 @@ OPENPROJECT_ENV_FILE=/secure/path/openproject.env ./scripts/install.sh
 | Tool | Purpose | Access |
 | --- | --- | --- |
 | `list_projects` | List and filter visible projects | Read |
-| `search_work_packages` | Search work packages by subject and project | Read |
+| `search_work_packages` | Search by subject, project, assignee, due date, and status | Read |
 | `get_work_package` | Fetch a complete work package | Read |
 | `create_work_package` | Create a work package | Write |
 | `update_work_package` | Update selected work-package fields | Write |
