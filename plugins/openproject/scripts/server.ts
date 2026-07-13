@@ -91,7 +91,7 @@ server.registerTool(
         String(value ?? "").toLowerCase().includes(normalized),
       );
     });
-    return result(projects.map(compact));
+    return result(projects.map((project) => compact(project, baseUrl)));
   },
 );
 
@@ -109,7 +109,9 @@ server.registerTool(
   async ({ query, projectId, pageSize }) => {
     const path = buildWorkPackageSearchPath({ query, projectId, pageSize });
     const collection = await api(path);
-    return result(elements(collection).map(compact));
+    return result(
+      elements(collection).map((workPackage) => compact(workPackage, baseUrl)),
+    );
   },
 );
 

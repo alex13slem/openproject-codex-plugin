@@ -96,6 +96,10 @@ OPENPROJECT_ENV_FILE=/secure/path/openproject.env ./scripts/install.sh
 | `update_work_package` | Update selected work-package fields | Write |
 | `add_work_package_comment` | Add a Markdown comment | Write |
 
+Project lists and work-package searches return a browser-ready `url` alongside
+the original HAL API `links`, so results can be opened without exposing tokens
+or private configuration.
+
 Write operations use the permissions of the API-token owner. Prefer a token
 with only the access you need, never commit it, and keep the environment file
 readable only by your user.

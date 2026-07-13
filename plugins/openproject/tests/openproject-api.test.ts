@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  buildBrowserUrl,
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
   compact,
@@ -81,13 +82,16 @@ describe("HAL helpers", () => {
 
   test("compacts a resource to fields useful in tool results", () => {
     expect(
-      compact({
-        id: 7,
-        subject: "Review API",
-        lockVersion: 3,
-        _links: { self: { href: "/api/v3/work_packages/7" } },
-        ignored: "large payload",
-      }),
+      compact(
+        {
+          id: 7,
+          subject: "Review API",
+          lockVersion: 3,
+          _links: { self: { href: "/api/v3/work_packages/7" } },
+          ignored: "large payload",
+        },
+        "https://tasks.example.com/",
+      ),
     ).toEqual({
       id: 7,
       name: undefined,
@@ -95,7 +99,24 @@ describe("HAL helpers", () => {
       subject: "Review API",
       lockVersion: 3,
       links: { self: { href: "/api/v3/work_packages/7" } },
+      url: "https://tasks.example.com/work_packages/7",
     });
+  });
+
+  test("builds browser URLs separately from HAL API links", () => {
+    expect(
+      buildBrowserUrl("https://tasks.example.com/", {
+        id: 4,
+        identifier: "store front",
+        _links: { self: { href: "/api/v3/projects/4" } },
+      }),
+    ).toBe("https://tasks.example.com/projects/store%20front");
+    expect(
+      buildBrowserUrl("https://tasks.example.com/", {
+        id: 42,
+        _links: { self: { href: "/api/v3/work_packages/42" } },
+      }),
+    ).toBe("https://tasks.example.com/work_packages/42");
   });
 });
 

@@ -59,7 +59,24 @@ export function elements(resource: HalResource): HalResource[] {
   return resource._embedded?.elements ?? [];
 }
 
-export function compact(resource: HalResource): Record<string, unknown> {
+export function buildBrowserUrl(
+  baseUrl: string,
+  resource: HalResource,
+): string | undefined {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+  if (resource.identifier) {
+    return `${normalizedBaseUrl}/projects/${encodeURIComponent(resource.identifier)}`;
+  }
+  if (typeof resource.id === "number") {
+    return `${normalizedBaseUrl}/work_packages/${resource.id}`;
+  }
+  return undefined;
+}
+
+export function compact(
+  resource: HalResource,
+  baseUrl: string,
+): Record<string, unknown> {
   return {
     id: resource.id,
     name: resource.name,
@@ -67,6 +84,7 @@ export function compact(resource: HalResource): Record<string, unknown> {
     subject: resource.subject,
     lockVersion: resource.lockVersion,
     links: resource._links,
+    url: buildBrowserUrl(baseUrl, resource),
   };
 }
 
