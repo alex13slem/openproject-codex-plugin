@@ -21,18 +21,18 @@
   <circle cx="1040" cy="74" r="160" fill="#2b7da1" opacity="0.12"/>
   <circle cx="1120" cy="390" r="230" fill="#34d399" opacity="0.08"/>
 
-  <g transform="translate(64 52) scale(0.87)">
+  <g transform="translate(80 56) scale(0.87)">
     <rect width="92" height="92" rx="24" fill="#0c2038" stroke="#63d3ff" stroke-width="2"/>
     <path d="M27 30h38M27 46h24M27 62h31" stroke="url(#accent)" stroke-width="6" stroke-linecap="round"/>
     <circle cx="66" cy="62" r="8" fill="#72f1b8" filter="url(#glow)"/>
   </g>
 
-  <text x="168" y="101" fill="#9bdfff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="600" letter-spacing="2">READ + WRITE · COMMUNITY FRIENDLY</text>
-  <text x="64" y="218" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="68" font-weight="750">OpenProject for Codex</text>
-  <text x="68" y="272" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">Search, create, update, and discuss work packages</text>
-  <text x="68" y="308" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">without leaving your coding workflow.</text>
+  <text x="184" y="105" fill="#9bdfff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="600" letter-spacing="2">READ + WRITE · COMMUNITY FRIENDLY</text>
+  <text x="80" y="222" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="68" font-weight="750">OpenProject for Codex</text>
+  <text x="80" y="277" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">Search, create, update, and discuss work packages</text>
+  <text x="80" y="313" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">without leaving your coding workflow.</text>
 
-  <g transform="translate(68 346)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="600">
+  <g transform="translate(80 342)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="600">
     <rect width="150" height="36" rx="18" fill="#132f4c" stroke="#39789d"/>
     <text x="24" y="24" fill="#9bdfff">API v3</text>
     <rect x="168" width="150" height="36" rx="18" fill="#132f4c" stroke="#39789d"/>
