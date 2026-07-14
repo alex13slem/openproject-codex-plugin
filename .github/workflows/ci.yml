@@ -78,4 +78,5 @@ jobs:
           python3 -m json.tool .agents/plugins/marketplace.json >/dev/null
           python3 -m json.tool plugins/openproject/.codex-plugin/plugin.json >/dev/null
           python3 -m json.tool plugins/openproject/.mcp.json >/dev/null
+          python3 -m json.tool glama.json >/dev/null
           python3 -m json.tool server.json >/dev/null
