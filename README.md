@@ -10,8 +10,30 @@
 [![OpenProject API v3](https://img.shields.io/badge/OpenProject-API%20v3-1A67A3)](https://www.openproject.org/docs/api/)
 [![GitHub stars](https://img.shields.io/github/stars/alex13slem/openproject-codex-plugin?style=flat)](https://github.com/alex13slem/openproject-codex-plugin/stargazers)
 
-An unofficial Codex plugin and MCP server for managing OpenProject work without
-leaving your coding workflow.
+**Manage OpenProject from Codex — including creating, updating, and commenting
+on work packages.** This free, open-source integration uses API v3 and is
+designed to work with OpenProject Community and Enterprise editions.
+
+<p align="center">
+  <img src="assets/demo.svg" alt="Codex finding and updating an OpenProject work package" width="900">
+</p>
+
+## Why this project
+
+- **Read and write:** search, create, update, assign, and comment from Codex.
+- **Community Edition friendly:** it uses the generally available OpenProject
+  API v3 rather than requiring the OpenProject MCP Enterprise add-on.
+- **Codex-native workflow:** tools and guidance are packaged together so Codex
+  can safely turn natural-language requests into explicit OpenProject actions.
+- **Runs locally:** credentials stay in a private file on your machine, and
+  OpenProject remains the source of truth for permissions.
+
+OpenProject also provides an official MCP server in Professional plans and
+above. As of July 2026, that server exposes read-only tools. This community
+project is a good fit when you need write operations, Codex-specific guidance,
+or support for Community Edition. See the
+[official MCP documentation](https://www.openproject.org/docs/system-admin-guide/integrations/mcp-server/)
+for the current capabilities of OpenProject's server.
 
 ## What it can do
 
@@ -43,6 +65,9 @@ source of truth for permissions and work-package state.
 - An OpenProject API token with access to the projects you want to manage
 
 The plugin and its local MCP server run natively on macOS, Linux, and Windows.
+It uses stable OpenProject API v3 endpoints and does not require an OpenProject
+Enterprise add-on. If you use Community Edition, make sure API tokens are
+enabled in your instance.
 
 ## Quick start
 
@@ -104,6 +129,9 @@ Start a new Codex thread, then try prompts such as:
 - `Find work packages mentioning the checkout flow.`
 - `Add a progress comment to work package 123.`
 
+The first two prompts are read-only. Write tools are used only for explicit,
+unambiguous requests and return a direct link to the affected work package.
+
 To keep the environment file elsewhere, pass its absolute path during
 installation on any desktop OS:
 
@@ -138,6 +166,20 @@ support can add the repository as a local marketplace. The Bun installer and
 its shell wrappers are the portable fallback when only MCP configuration is
 available.
 
+## OpenProject's MCP server compared
+
+| Capability | This project | OpenProject MCP server |
+| --- | --- | --- |
+| Community Edition | Yes | Enterprise add-on |
+| Search and read | Yes | Yes |
+| Create, update, and comment | Yes | Read-only as of July 2026 |
+| Codex workflow guidance | Included | Client-independent |
+| Deployment | Local Bun process | Built into OpenProject |
+
+The official server may be preferable for centrally administered, multi-user
+OAuth deployments. This project is aimed at individual Codex users who want a
+portable integration and write-capable workflows.
+
 ## Documentation
 
 - [Architecture and security boundaries](docs/architecture.md)
@@ -145,6 +187,18 @@ available.
 - [Roadmap](ROADMAP.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
+
+## Community
+
+- Ask setup questions and share workflows in
+  [GitHub Discussions](https://github.com/alex13slem/openproject-codex-plugin/discussions).
+- Report reproducible bugs with the
+  [bug template](https://github.com/alex13slem/openproject-codex-plugin/issues/new?template=bug_report.yml).
+- Propose focused improvements with the
+  [feature template](https://github.com/alex13slem/openproject-codex-plugin/issues/new?template=feature_request.yml).
+
+Please do not include API tokens, private instance URLs, or customer data in
+public posts.
 
 ## Development
 
@@ -177,7 +231,7 @@ plugins/openproject/
 └── tests/                      # Bun unit tests
 ```
 
-Planned work is tracked in the [v0.2.0 roadmap](ROADMAP.md). Contributions and
+Planned work is tracked in the [project roadmap](ROADMAP.md). Contributions and
 well-scoped feature proposals are welcome.
 
 ## Uninstall
@@ -198,6 +252,11 @@ Windows PowerShell:
 
 This project is community-maintained and is not affiliated with or endorsed by
 OpenProject GmbH or OpenAI. OpenProject is a trademark of OpenProject GmbH.
+
+If this integration saves you time, consider
+[starring the repository](https://github.com/alex13slem/openproject-codex-plugin)
+to help other OpenProject users discover it. Bug reports, tested-version
+reports, and focused contributions are equally valuable.
 
 ## License
 

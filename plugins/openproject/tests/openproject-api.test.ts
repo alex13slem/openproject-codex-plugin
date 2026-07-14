@@ -7,6 +7,7 @@ import {
   compactWorkPackage,
   createOpenProjectApi,
   elements,
+  workPackageWebUrl,
 } from "../scripts/openproject-api.js";
 import { resolveEnvFile } from "../scripts/config.js";
 
@@ -131,22 +132,26 @@ describe("HAL helpers", () => {
 
   test("compacts a work package without returning every HAL action link", () => {
     expect(
-      compactWorkPackage({
-        id: 8,
-        subject: "Due today",
-        startDate: "2026-07-12",
-        dueDate: "2026-07-13",
-        percentageDone: 25,
-        _links: {
-          project: { href: "/api/v3/projects/2", title: "ERP" },
-          status: { href: "/api/v3/statuses/7", title: "In progress" },
-          assignee: { href: "/api/v3/users/4", title: "Alex" },
-          update: { href: "/api/v3/work_packages/8/form" },
+      compactWorkPackage(
+        {
+          id: 8,
+          subject: "Due today",
+          startDate: "2026-07-12",
+          dueDate: "2026-07-13",
+          percentageDone: 25,
+          _links: {
+            project: { href: "/api/v3/projects/2", title: "ERP" },
+            status: { href: "/api/v3/statuses/7", title: "In progress" },
+            assignee: { href: "/api/v3/users/4", title: "Alex" },
+            update: { href: "/api/v3/work_packages/8/form" },
+          },
         },
-      }),
+        "https://tasks.example.com/",
+      ),
     ).toEqual({
       id: 8,
       subject: "Due today",
+      url: "https://tasks.example.com/work_packages/8",
       startDate: "2026-07-12",
       dueDate: "2026-07-13",
       percentageDone: 25,
@@ -157,6 +162,13 @@ describe("HAL helpers", () => {
       assignee: { href: "/api/v3/users/4", title: "Alex" },
       self: null,
     });
+  });
+
+  test("builds clickable work package URLs", () => {
+    expect(workPackageWebUrl("https://tasks.example.com/", 42)).toBe(
+      "https://tasks.example.com/work_packages/42",
+    );
+    expect(workPackageWebUrl("https://tasks.example.com", undefined)).toBeUndefined();
   });
 });
 

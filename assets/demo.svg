@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="title description">
+  <title id="title">OpenProject for Codex example workflow</title>
+  <desc id="description">Codex finds an active OpenProject work package and adds a progress comment after confirmation.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#102d49"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#63d3ff"/>
+      <stop offset="1" stop-color="#72f1b8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="600" rx="28" fill="url(#background)"/>
+  <rect x="34" y="34" width="1132" height="532" rx="20" fill="#091827" stroke="#285272" stroke-width="2"/>
+  <circle cx="70" cy="70" r="7" fill="#ff6b6b"/>
+  <circle cx="94" cy="70" r="7" fill="#ffd166"/>
+  <circle cx="118" cy="70" r="7" fill="#72f1b8"/>
+  <text x="600" y="77" text-anchor="middle" fill="#7da0b9" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">Codex · OpenProject</text>
+  <line x1="34" y1="96" x2="1166" y2="96" stroke="#285272"/>
+
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22">
+    <rect x="72" y="128" width="700" height="64" rx="16" fill="#153550"/>
+    <text x="98" y="168" fill="#ffffff">You: Show my active checkout tasks.</text>
+
+    <rect x="258" y="218" width="852" height="116" rx="16" fill="#102b2e" stroke="#286657"/>
+    <text x="286" y="258" fill="#9ff6cf">Codex: Found 2 active work packages:</text>
+    <text x="286" y="297" fill="#d8e8f2">#142 Handle expired checkout sessions · In progress</text>
+    <text x="286" y="323" fill="#9bb4c5" font-size="18">#157 Add payment retry telemetry · New</text>
+
+    <rect x="72" y="364" width="848" height="64" rx="16" fill="#153550"/>
+    <text x="98" y="404" fill="#ffffff">You: Comment on #142: API fix is ready for review.</text>
+
+    <rect x="258" y="454" width="852" height="76" rx="16" fill="#102b2e" stroke="#286657"/>
+    <circle cx="294" cy="492" r="13" fill="url(#accent)"/>
+    <path d="M287 492l5 5 10-12" fill="none" stroke="#07111f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="324" y="500" fill="#9ff6cf">Comment added to OpenProject work package #142.</text>
+  </g>
+</svg>

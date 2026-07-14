@@ -27,9 +27,9 @@
     <circle cx="66" cy="62" r="8" fill="#72f1b8" filter="url(#glow)"/>
   </g>
 
-  <text x="190" y="116" fill="#9bdfff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="600" letter-spacing="2">MCP SERVER + CODEX PLUGIN</text>
+  <text x="190" y="116" fill="#9bdfff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="600" letter-spacing="2">READ + WRITE · COMMUNITY FRIENDLY</text>
   <text x="72" y="224" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="68" font-weight="750">OpenProject for Codex</text>
-  <text x="76" y="278" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">Plan, search, update, and discuss work packages</text>
+  <text x="76" y="278" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">Search, create, update, and discuss work packages</text>
   <text x="76" y="316" fill="#c7dded" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27">without leaving your coding workflow.</text>
 
   <g transform="translate(76 356)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="600">
