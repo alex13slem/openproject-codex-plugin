@@ -1,6 +1,6 @@
 ---
 name: openproject
-description: Manage projects and work packages in a connected OpenProject instance. Use when the user asks to find, inspect, create, update, assign, prioritize, or comment on OpenProject tasks.
+description: Manage projects and work packages in a connected OpenProject instance. Use when the user asks to find, inspect, create, update, assign, prioritize, comment on OpenProject tasks, or read their attachments.
 ---
 
 # OpenProject
@@ -22,6 +22,9 @@ Use the `openproject` MCP tools for OpenProject work.
    Search can be narrowed by project, assignee, exact due date, and either an
    exact status or the open/closed status category. Use `assignedToMe` for the
    authenticated user's work packages.
-3. Use `create_work_package` for new tasks. Omit `typeId` to select the project's `Task` type automatically.
-4. Use `update_work_package` for field changes.
-5. Use `add_work_package_comment` for progress notes and follow-ups.
+3. Use `list_work_package_attachments` and then
+   `get_work_package_attachment` when the task includes attached files. Raise
+   `maxBytes` only when the listed file size requires it.
+4. Use `create_work_package` for new tasks. Omit `typeId` to select the project's `Task` type automatically.
+5. Use `update_work_package` for field changes.
+6. Use `add_work_package_comment` for progress notes and follow-ups.

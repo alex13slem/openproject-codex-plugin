@@ -1,7 +1,12 @@
 # OpenProject MCP server
 
 A write-capable Model Context Protocol server for OpenProject API v3. It can
-search, create, update, assign, prioritize, and comment on work packages.
+search, create, update, assign, prioritize, comment on work packages, and read
+their attachments.
+
+Attachment tools can list files on a work package and fetch their content.
+Text-based files are returned directly; binary files are returned as embedded
+MCP resources. Downloads are size-limited per request.
 
 The package is maintained as part of
 [OpenProject for Codex](https://github.com/alex13slem/openproject-codex-plugin),

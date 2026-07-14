@@ -9,8 +9,18 @@ export type HalResource = Record<string, unknown> & {
   startDate?: string | null;
   dueDate?: string | null;
   percentageDone?: number | null;
+  fileName?: string;
+  fileSize?: number;
+  filesize?: number;
+  contentType?: string;
+  status?: string;
   _links?: Record<string, HalLink | HalLink[]>;
   _embedded?: { elements?: HalResource[] };
+};
+
+export type DownloadedFile = {
+  bytes: Uint8Array;
+  contentType: string;
 };
 
 type FetchLike = (
@@ -25,12 +35,9 @@ export function createOpenProjectApi(
 ) {
   const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
 
-  return async function api<T extends HalResource>(
-    path: string,
-    init: RequestInit = {},
-  ): Promise<T> {
+  async function request(path: string, init: RequestInit, accept: string) {
     const headers = new Headers(init.headers);
-    if (!headers.has("Accept")) headers.set("Accept", "application/hal+json");
+    if (!headers.has("Accept")) headers.set("Accept", accept);
     if (!headers.has("Authorization")) {
       headers.set("Authorization", `Bearer ${apiToken}`);
     }
@@ -42,20 +49,96 @@ export function createOpenProjectApi(
       ...init,
       headers,
     });
-    const text = await response.text();
-    let body: unknown = text;
-    try {
-      body = text ? JSON.parse(text) : {};
-    } catch {
-      // Preserve a non-JSON error response for diagnostics.
-    }
     if (!response.ok) {
+      const text = await response.text();
+      let body: unknown = text;
+      try {
+        body = text ? JSON.parse(text) : {};
+      } catch {
+        // Preserve a non-JSON error response for diagnostics.
+      }
       throw new Error(
         `OpenProject HTTP ${response.status}: ${JSON.stringify(body).slice(0, 2000)}`,
       );
     }
-    return body as T;
+    return response;
+  }
+
+  async function api<T extends HalResource>(
+    path: string,
+    init: RequestInit = {},
+  ): Promise<T> {
+    const response = await request(path, init, "application/hal+json");
+    const text = await response.text();
+    return (text ? JSON.parse(text) : {}) as T;
+  }
+
+  api.download = async (
+    path: string,
+    maxBytes: number,
+  ): Promise<DownloadedFile> => {
+    const response = await request(path, {}, "*/*");
+    const declaredSize = Number(response.headers.get("Content-Length"));
+    if (Number.isFinite(declaredSize) && declaredSize > maxBytes) {
+      await response.body?.cancel();
+      throw new Error(
+        `Attachment is ${declaredSize} bytes; the configured limit is ${maxBytes} bytes`,
+      );
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) return { bytes: new Uint8Array(), contentType: "application/octet-stream" };
+
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new Error(`Attachment exceeds the configured limit of ${maxBytes} bytes`);
+      }
+      chunks.push(value);
+    }
+
+    const bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return {
+      bytes,
+      contentType:
+        response.headers.get("Content-Type")?.split(";", 1)[0] ??
+        "application/octet-stream",
+    };
   };
+
+  return api;
+}
+
+export function compactAttachment(resource: HalResource): Record<string, unknown> {
+  return {
+    id: resource.id,
+    fileName: resource.fileName,
+    fileSize: resource.fileSize ?? resource.filesize,
+    contentType: resource.contentType,
+    status: resource.status,
+    author: linkedResource(resource, "author"),
+    downloadLocation: linkedResource(resource, "downloadLocation"),
+  };
+}
+
+export function isTextAttachment(fileName: string, contentType: string): boolean {
+  if (contentType.startsWith("text/")) return true;
+  if (/^(application\/(json|xml|yaml|x-yaml|javascript))$/.test(contentType)) {
+    return true;
+  }
+  return /\.(md|txt|csv|json|xml|ya?ml|log|html?|css|m?js|cjs|tsx?|py|sql)$/i.test(
+    fileName,
+  );
 }
 
 export function elements(resource: HalResource): HalResource[] {
