@@ -4,9 +4,11 @@ import {
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
   compact,
+  compactAttachment,
   compactWorkPackage,
   createOpenProjectApi,
   elements,
+  isTextAttachment,
   workPackageWebUrl,
 } from "../scripts/openproject-api.js";
 import { resolveEnvFile } from "../scripts/config.js";
@@ -100,6 +102,45 @@ describe("createOpenProjectApi", () => {
       /OpenProject HTTP 404.*NotFound/,
     );
   });
+
+  test("downloads authenticated attachment content with a size limit", async () => {
+    let requestInit: RequestInit | undefined;
+    const api = createOpenProjectApi(
+      "https://tasks.example.com",
+      "test-token",
+      async (_input, init) => {
+        requestInit = init;
+        return new Response("attachment body", {
+          status: 200,
+          headers: { "Content-Type": "text/markdown", "Content-Length": "15" },
+        });
+      },
+    );
+
+    const downloaded = await api.download("/api/v3/attachments/4/content", 100);
+    const headers = new Headers(requestInit?.headers);
+
+    expect(headers.get("Accept")).toBe("*/*");
+    expect(headers.get("Authorization")).toBe("Bearer test-token");
+    expect(downloaded.contentType).toBe("text/markdown");
+    expect(new TextDecoder().decode(downloaded.bytes)).toBe("attachment body");
+  });
+
+  test("rejects attachment downloads above the declared size limit", async () => {
+    const api = createOpenProjectApi(
+      "https://tasks.example.com",
+      "test-token",
+      async () =>
+        new Response("too large", {
+          status: 200,
+          headers: { "Content-Length": "1000" },
+        }),
+    );
+
+    await expect(api.download("/api/v3/attachments/4/content", 100)).rejects.toThrow(
+      /1000 bytes.*100 bytes/,
+    );
+  });
 });
 
 describe("HAL helpers", () => {
@@ -169,6 +210,29 @@ describe("HAL helpers", () => {
       "https://tasks.example.com/work_packages/42",
     );
     expect(workPackageWebUrl("https://tasks.example.com", undefined)).toBeUndefined();
+  });
+
+  test("compacts attachment metadata and detects readable text files", () => {
+    expect(
+      compactAttachment({
+        id: 3,
+        fileName: "accounting.md",
+        fileSize: 120,
+        contentType: "application/octet-stream",
+        status: "uploaded",
+        _links: { author: { href: "/api/v3/users/2", title: "Alex" } },
+      }),
+    ).toEqual({
+      id: 3,
+      fileName: "accounting.md",
+      fileSize: 120,
+      contentType: "application/octet-stream",
+      status: "uploaded",
+      author: { href: "/api/v3/users/2", title: "Alex" },
+      downloadLocation: null,
+    });
+    expect(isTextAttachment("accounting.md", "application/octet-stream")).toBe(true);
+    expect(isTextAttachment("report.pdf", "application/pdf")).toBe(false);
   });
 });
 

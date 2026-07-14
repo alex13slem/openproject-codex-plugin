@@ -6,9 +6,11 @@ import {
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
   compact,
+  compactAttachment,
   compactWorkPackage,
   createOpenProjectApi,
   elements,
+  isTextAttachment,
   type HalLink,
   workPackageWebUrl,
 } from "./openproject-api.js";
@@ -74,7 +76,7 @@ async function resolveProjectType(
   return selected.id;
 }
 
-const server = new McpServer({ name: "openproject", version: "0.3.0" });
+const server = new McpServer({ name: "openproject", version: "0.4.0" });
 
 server.registerTool(
   "list_projects",
@@ -167,6 +169,90 @@ server.registerTool(
     annotations: { readOnlyHint: true },
   },
   async ({ id }) => result(await api(`/api/v3/work_packages/${id}`)),
+);
+
+server.registerTool(
+  "list_work_package_attachments",
+  {
+    description: "List files attached directly to an OpenProject work package.",
+    inputSchema: { workPackageId: z.number().int().positive() },
+    annotations: { readOnlyHint: true },
+  },
+  async ({ workPackageId }) => {
+    const collection = await api(
+      `/api/v3/work_packages/${workPackageId}/attachments`,
+    );
+    return result(elements(collection).map(compactAttachment));
+  },
+);
+
+server.registerTool(
+  "get_work_package_attachment",
+  {
+    description:
+      "Download an attachment that belongs to a work package. Text files are returned as text; other files are returned as an embedded base64 resource.",
+    inputSchema: {
+      workPackageId: z.number().int().positive(),
+      attachmentId: z.number().int().positive(),
+      maxBytes: z.number().int().min(1).max(5_000_000).default(1_000_000),
+    },
+    annotations: { readOnlyHint: true },
+  },
+  async ({ workPackageId, attachmentId, maxBytes }) => {
+    const collection = await api(
+      `/api/v3/work_packages/${workPackageId}/attachments`,
+    );
+    const attachment = elements(collection).find(
+      (candidate) => candidate.id === attachmentId,
+    );
+    if (!attachment) {
+      throw new Error(
+        `Attachment ${attachmentId} does not belong to work package ${workPackageId}`,
+      );
+    }
+
+    const fileName = attachment.fileName ?? `attachment-${attachmentId}`;
+    const fileSize = attachment.fileSize ?? attachment.filesize;
+    if (typeof fileSize === "number" && fileSize > maxBytes) {
+      throw new Error(
+        `Attachment is ${fileSize} bytes; increase maxBytes to read it (maximum 5000000)`,
+      );
+    }
+
+    const downloaded = await api.download(
+      `/api/v3/attachments/${attachmentId}/content`,
+      maxBytes,
+    );
+    const contentType = attachment.contentType ?? downloaded.contentType;
+    const metadata = JSON.stringify(
+      { workPackageId, ...compactAttachment(attachment), contentType },
+      null,
+      2,
+    );
+
+    if (isTextAttachment(fileName, contentType)) {
+      return {
+        content: [
+          { type: "text" as const, text: metadata },
+          { type: "text" as const, text: new TextDecoder().decode(downloaded.bytes) },
+        ],
+      };
+    }
+
+    return {
+      content: [
+        { type: "text" as const, text: metadata },
+        {
+          type: "resource" as const,
+          resource: {
+            uri: `openproject://work-packages/${workPackageId}/attachments/${attachmentId}/${encodeURIComponent(fileName)}`,
+            mimeType: contentType,
+            blob: Buffer.from(downloaded.bytes).toString("base64"),
+          },
+        },
+      ],
+    };
+  },
 );
 
 server.registerTool(

@@ -1,6 +1,6 @@
 {
   "name": "openproject",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Manage OpenProject work packages from Codex",
   "author": {
     "name": "alex13slem"
@@ -10,7 +10,7 @@
   "interface": {
     "displayName": "OpenProject",
     "shortDescription": "Manage projects and work packages.",
-    "longDescription": "Search, create, update, and comment on work packages in an OpenProject instance.",
+    "longDescription": "Search, create, update, comment on, and read attachments from OpenProject work packages.",
     "developerName": "alex13slem",
     "category": "Productivity",
     "capabilities": [
