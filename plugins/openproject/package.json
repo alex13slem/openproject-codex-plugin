@@ -1,6 +1,6 @@
 {
   "name": "openproject-codex-plugin",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Write-capable MCP server and Codex plugin for OpenProject API v3",
   "mcpName": "io.github.alex13slem/openproject",
   "license": "MIT",

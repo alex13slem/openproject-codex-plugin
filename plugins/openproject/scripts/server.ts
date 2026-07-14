@@ -76,7 +76,7 @@ async function resolveProjectType(
   return selected.id;
 }
 
-const server = new McpServer({ name: "openproject", version: "0.3.0" });
+const server = new McpServer({ name: "openproject", version: "0.4.0" });
 
 server.registerTool(
   "list_projects",

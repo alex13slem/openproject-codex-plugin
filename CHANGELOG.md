@@ -3,6 +3,14 @@
 All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.4.0 — 2026-07-14
+
+### Added
+
+- Work-package attachment listing and authenticated downloads.
+- Direct text-file responses and embedded MCP resources for binary files, with
+  configurable download size limits.
+
 ## 0.3.0 — 2026-07-14
 
 ### Added
