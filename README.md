@@ -1,7 +1,7 @@
 # OpenProject for Codex
 
 <p align="center">
-  <img src="assets/banner.svg" alt="OpenProject for Codex" width="100%">
+  <img src="assets/banner-v2.svg" alt="OpenProject for Codex" width="100%">
 </p>
 
 [![CI](https://github.com/alex13slem/openproject-codex-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/alex13slem/openproject-codex-plugin/actions/workflows/ci.yml)
