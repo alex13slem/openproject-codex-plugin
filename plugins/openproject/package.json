@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alex13slem/openproject-codex-plugin.git"
+    "url": "git+https://github.com/alex13slem/openproject-codex-plugin.git"
   },
   "homepage": "https://github.com/alex13slem/openproject-codex-plugin#readme",
   "type": "module",
   "bin": {
-    "openproject-mcp": "./dist/openproject-mcp.js"
+    "openproject-mcp": "dist/openproject-mcp.js"
   },
   "files": [
     "dist",
