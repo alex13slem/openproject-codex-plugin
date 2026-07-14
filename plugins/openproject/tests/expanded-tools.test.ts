@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -148,7 +154,7 @@ describe("expanded OpenProject tools", () => {
     symlinkSync(outsideFile, linkedOutsideFile);
 
     try {
-      expect(assertAllowedUploadPath(allowedFile, allowed)).toBe(allowedFile);
+      expect(assertAllowedUploadPath(allowedFile, allowed)).toBe(realpathSync(allowedFile));
       expect(() => assertAllowedUploadPath(outsideFile, allowed)).toThrow(
         /outside OPENPROJECT_ALLOWED_UPLOAD_DIRS/,
       );
