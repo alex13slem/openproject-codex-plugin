@@ -10,9 +10,10 @@
 [![OpenProject API v3](https://img.shields.io/badge/OpenProject-API%20v3-1A67A3)](https://www.openproject.org/docs/api/)
 [![GitHub stars](https://img.shields.io/github/stars/alex13slem/openproject-codex-plugin?style=flat)](https://github.com/alex13slem/openproject-codex-plugin/stargazers)
 
-**Manage OpenProject from Codex — including creating, updating, and commenting
-on work packages.** This free, open-source integration uses API v3 and is
-designed to work with OpenProject Community and Enterprise editions.
+**Manage OpenProject from Codex — projects, work packages, attachments,
+relations, boards, users, watchers, and notifications.** This free,
+open-source integration exposes 41 focused API v3 tools and is designed to
+work with OpenProject Community and Enterprise editions.
 
 <p align="center">
   <img src="assets/demo.svg" alt="Codex finding and updating an OpenProject work package" width="900">
@@ -20,7 +21,8 @@ designed to work with OpenProject Community and Enterprise editions.
 
 ## Why this project
 
-- **Read and write:** search, create, update, assign, and comment from Codex.
+- **Broad read and write coverage:** manage projects and work packages, upload
+  attachments, connect related tasks, inspect boards, and handle notifications.
 - **Community Edition friendly:** it uses the generally available OpenProject
   API v3 rather than requiring the OpenProject MCP Enterprise add-on.
 - **Codex-native workflow:** tools and guidance are packaged together so Codex
@@ -37,11 +39,18 @@ for the current capabilities of OpenProject's server.
 
 ## What it can do
 
-- Find projects and work packages you can access.
-- Read complete work-package details.
-- Create tasks with Markdown descriptions.
-- Update subjects, descriptions, assignees, priorities, and statuses.
-- Add Markdown comments to work packages.
+- Create, inspect, update, count, archive, and delete projects.
+- Search work packages with native filters, sorting, and pagination.
+- Create and update tasks, dates, estimates, progress, hierarchy, assignees,
+  accountable users, priorities, statuses, and versions.
+- Read activity history, add comments, and delete work packages.
+- List, download, upload, and delete attachments with size limits.
+- Create and inspect work-package relations and manage watchers.
+- Find users and valid assignees, including without global user-list access.
+- Read and clear notifications and inspect Kanban-style boards.
+- Discover statuses, priorities, types, and project versions.
+- Read otherwise unsupported API v3 resources through a restricted GET-only
+  escape hatch.
 - Guide Codex toward safe, explicit OpenProject write operations.
 
 ## Example workflow
@@ -130,6 +139,18 @@ Set `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`, save it, then install:
 The installer passes paths as separate arguments, so repository and profile
 paths containing spaces work on every supported desktop OS.
 
+### Optional configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `OPENPROJECT_PAGE_SIZE` | `25` | Default collection page size, from 1 to 100 |
+| `OPENPROJECT_TIMEOUT_MS` | `30000` | Request timeout, from 1 to 300 seconds |
+| `OPENPROJECT_AUTH_MODE` | `basic` | Use `basic` for broad compatibility or `bearer` for OpenProject 17.2+ |
+| `OPENPROJECT_ALLOWED_UPLOAD_DIRS` | Current working directory | Platform-separated directories from which upload tools may read files |
+
+Existing configurations may use `OPENPROJECT_BASE_URL` and
+`OPENPROJECT_API_KEY` as compatibility aliases.
+
 ### Start using the plugin
 
 Start a new Codex thread, then try prompts such as:
@@ -154,18 +175,32 @@ bun scripts/install.ts --env-file /secure/path/openproject.env
 
 ## Tools
 
-| Tool | Purpose | Access |
+The 41 tools form one consistent OpenProject API surface:
+
+| Area | Read tools | Write tools |
 | --- | --- | --- |
-| `list_projects` | List and filter visible projects | Read |
-| `search_work_packages` | Search by subject, project, assignee, due date, and status | Read |
-| `get_work_package` | Fetch a complete work package | Read |
-| `create_work_package` | Create a work package | Write |
-| `update_work_package` | Update selected work-package fields | Write |
-| `add_work_package_comment` | Add a Markdown comment | Write |
+| Projects | `list_projects`, `get_project`, `count_projects` | `create_project`, `update_project`, `delete_project` |
+| Work packages | `search_work_packages`, `get_work_package`, `count_work_packages`, `list_work_package_activities` | `create_work_package`, `update_work_package`, `add_work_package_comment`, `delete_work_package` |
+| Attachments | `list_work_package_attachments`, `get_work_package_attachment` | `upload_work_package_attachment`, `delete_work_package_attachment` |
+| Relations | `list_work_package_relations`, `get_work_package_relation` | `create_work_package_relation`, `delete_work_package_relation` |
+| Users | `get_current_user`, `list_users`, `get_user`, `list_available_assignees` | — |
+| Watchers | `list_work_package_watchers` | `add_work_package_watcher`, `remove_work_package_watcher` |
+| Notifications | `list_notifications`, `get_notification` | `mark_notification_read`, `mark_all_notifications_read` |
+| Boards | `list_boards`, `get_board`, `list_board_lanes` | — |
+| Reference data | `list_work_package_types`, `list_work_package_statuses`, `list_work_package_priorities`, `list_project_versions` | — |
+| Advanced | `get_openproject_api` | — |
+
+List tools return pagination metadata. Native filter objects use `field`,
+`operator`, and string `values`; count tools should be preferred when only a
+total is needed. `get_openproject_api` accepts only relative GET paths under
+`/api/v3` and cannot call another host.
 
 Write operations use the permissions of the API-token owner. Prefer a token
 with only the access you need, never commit it, and keep the environment file
-readable only by your user.
+readable only by your user. File uploads read only explicitly supplied paths
+under configured upload roots, resolve symlinks before enforcing that boundary,
+and reject files above the requested size limit. Delete operations are
+separately marked destructive so MCP clients can require confirmation.
 
 ## Codex plugin marketplace
 
@@ -181,7 +216,7 @@ available.
 | --- | --- | --- |
 | Community Edition | Yes | Enterprise add-on |
 | Search and read | Yes | Yes |
-| Create, update, and comment | Yes | Read-only as of July 2026 |
+| Create, update, comment, relate, and attach | Yes | Read-only as of July 2026 |
 | Codex workflow guidance | Included | Client-independent |
 | Deployment | Local Bun process | Built into OpenProject |
 

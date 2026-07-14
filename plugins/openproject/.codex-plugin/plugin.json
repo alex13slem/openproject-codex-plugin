@@ -1,7 +1,7 @@
 {
   "name": "openproject",
-  "version": "0.4.0",
-  "description": "Manage OpenProject work packages from Codex",
+  "version": "0.5.0",
+  "description": "Manage OpenProject projects and work packages from Codex",
   "author": {
     "name": "alex13slem"
   },
@@ -9,8 +9,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "OpenProject",
-    "shortDescription": "Manage projects and work packages.",
-    "longDescription": "Search, create, update, comment on, and read attachments from OpenProject work packages.",
+    "shortDescription": "Manage OpenProject projects and tasks.",
+    "longDescription": "Manage projects, work packages, attachments, relations, boards, users, watchers, and notifications through OpenProject API v3.",
     "developerName": "alex13slem",
     "category": "Productivity",
     "capabilities": [

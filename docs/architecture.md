@@ -18,7 +18,10 @@ flowchart LR
 - `scripts/server.ts` loads configuration, registers MCP tools, and maps tool
   inputs to OpenProject operations.
 - `scripts/openproject-api.ts` owns HTTP authentication, HAL collection
-  helpers, filter encoding, update payloads, and API error handling.
+  helpers, filter encoding, multipart transfers, update payloads, timeouts, and
+  API error handling.
+- `scripts/expanded-tools.ts` registers the broader project, task, attachment,
+  relation, user, watcher, notification, board, and reference-data surface.
 - `skills/openproject/SKILL.md` guides Codex toward safe reads and explicit
   writes.
 - `.mcp.json` describes how Codex starts the server from the plugin.
@@ -48,3 +51,9 @@ This avoids silently overwriting concurrent changes.
   the API token owner's permissions.
 - Read and write tools are annotated separately, and the bundled skill
   requires an explicit, unambiguous request before a write.
+- Destructive tools carry a separate annotation for client-side confirmation.
+- The generic read escape hatch rejects absolute URLs and paths outside
+  `/api/v3`, so the configured OpenProject origin remains the only network
+  destination.
+- Attachment downloads and local-file uploads enforce explicit byte limits;
+  uploads also resolve symlinks and stay inside configured allowlisted roots.
