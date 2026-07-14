@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { join } from "node:path";
 import {
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
@@ -7,6 +8,35 @@ import {
   createOpenProjectApi,
   elements,
 } from "../scripts/openproject-api.js";
+import { resolveEnvFile } from "../scripts/config.js";
+
+describe("configuration", () => {
+  test("uses the cross-platform Codex directory for new installations", () => {
+    const home = join("home", "test");
+    expect(resolveEnvFile(undefined, home, () => false)).toBe(
+      join(home, ".codex", "openproject.env"),
+    );
+  });
+
+  test("keeps an existing legacy environment file working", () => {
+    const home = join("home", "test");
+    const legacyPath = join(home, ".config", "codex", "openproject.env");
+    expect(
+      resolveEnvFile(
+        undefined,
+        home,
+        (path) => path === legacyPath,
+      ),
+    ).toBe(legacyPath);
+  });
+
+  test("prefers an explicitly configured environment file", () => {
+    const explicitPath = join(process.cwd(), "secure", "openproject.env");
+    expect(resolveEnvFile(explicitPath, join("home", "test"), () => false)).toBe(
+      explicitPath,
+    );
+  });
+});
 
 describe("createOpenProjectApi", () => {
   test("normalizes the base URL and sends required headers", async () => {

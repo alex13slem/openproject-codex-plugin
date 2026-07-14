@@ -42,6 +42,8 @@ source of truth for permissions and work-package state.
 - Codex CLI with MCP support
 - An OpenProject API token with access to the projects you want to manage
 
+The plugin and its local MCP server run natively on macOS, Linux, and Windows.
+
 ## Quick start
 
 Clone the repository:
@@ -51,12 +53,14 @@ git clone https://github.com/alex13slem/openproject-codex-plugin.git
 cd openproject-codex-plugin
 ```
 
+### macOS and Linux
+
 Create a private environment file:
 
 ```bash
-mkdir -p ~/.config/codex
-cp .env.example ~/.config/codex/openproject.env
-chmod 600 ~/.config/codex/openproject.env
+mkdir -p ~/.codex
+cp .env.example ~/.codex/openproject.env
+chmod 600 ~/.codex/openproject.env
 ```
 
 Set your OpenProject URL and API token in that file:
@@ -72,6 +76,28 @@ Install the MCP integration:
 ./scripts/install.sh
 ```
 
+### Windows
+
+From PowerShell, create the environment file:
+
+```powershell
+$envDir = Join-Path $HOME ".codex"
+New-Item -ItemType Directory -Force $envDir
+Copy-Item .env.example (Join-Path $envDir "openproject.env")
+notepad (Join-Path $envDir "openproject.env")
+```
+
+Set `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`, save it, then install:
+
+```powershell
+.\scripts\install.ps1
+```
+
+The installer passes paths as separate arguments, so repository and profile
+paths containing spaces work on every supported desktop OS.
+
+### Start using the plugin
+
 Start a new Codex thread, then try prompts such as:
 
 - `Show my active OpenProject tasks.`
@@ -79,10 +105,14 @@ Start a new Codex thread, then try prompts such as:
 - `Add a progress comment to work package 123.`
 
 To keep the environment file elsewhere, pass its absolute path during
-installation:
+installation on any desktop OS:
 
 ```bash
-OPENPROJECT_ENV_FILE=/secure/path/openproject.env ./scripts/install.sh
+bun scripts/install.ts --env-file /secure/path/openproject.env
+```
+
+```powershell
+.\scripts\install.ps1 --env-file C:\secure\openproject.env
 ```
 
 ## Tools
@@ -104,8 +134,9 @@ readable only by your user.
 
 The repository includes a plugin manifest and a marketplace definition at
 `.agents/plugins/marketplace.json`. Codex installations with plugin marketplace
-support can add the repository as a local marketplace. The installation script
-is the portable fallback when only MCP configuration is available.
+support can add the repository as a local marketplace. The Bun installer and
+its shell wrappers are the portable fallback when only MCP configuration is
+available.
 
 ## Documentation
 
@@ -151,8 +182,16 @@ well-scoped feature proposals are welcome.
 
 ## Uninstall
 
+macOS and Linux:
+
 ```bash
 ./scripts/uninstall.sh
+```
+
+Windows PowerShell:
+
+```powershell
+.\scripts\uninstall.ps1
 ```
 
 ## Project status

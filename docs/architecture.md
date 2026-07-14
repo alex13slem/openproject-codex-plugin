@@ -22,6 +22,8 @@ flowchart LR
 - `skills/openproject/SKILL.md` guides Codex toward safe reads and explicit
   writes.
 - `.mcp.json` describes how Codex starts the server from the plugin.
+- `scripts/install.ts` and `scripts/uninstall.ts` provide the shared installer
+  implementation used by the Unix and Windows wrappers.
 - `tests/openproject-api.test.ts` exercises request construction, headers,
   errors, HAL helpers, filters, and optimistic-lock update payloads.
 

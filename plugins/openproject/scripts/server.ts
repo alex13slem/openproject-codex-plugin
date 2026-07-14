@@ -1,6 +1,4 @@
 import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -13,10 +11,9 @@ import {
   elements,
   type HalLink,
 } from "./openproject-api.js";
+import { resolveEnvFile } from "./config.js";
 
-const envFile =
-  process.env.OPENPROJECT_ENV_FILE ??
-  join(homedir(), ".config", "codex", "openproject.env");
+const envFile = resolveEnvFile();
 
 function loadEnvFile(path: string): void {
   const source = readFileSync(path, "utf8");
@@ -71,7 +68,7 @@ async function resolveProjectType(
   return selected.id;
 }
 
-const server = new McpServer({ name: "openproject", version: "0.1.0" });
+const server = new McpServer({ name: "openproject", version: "0.2.0" });
 
 server.registerTool(
   "list_projects",
