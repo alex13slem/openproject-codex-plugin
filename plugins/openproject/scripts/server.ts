@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -13,8 +13,6 @@ import {
   workPackageWebUrl,
 } from "./openproject-api.js";
 import { resolveEnvFile } from "./config.js";
-
-const envFile = resolveEnvFile();
 
 function loadEnvFile(path: string): void {
   const source = readFileSync(path, "utf8");
@@ -35,13 +33,20 @@ function loadEnvFile(path: string): void {
   }
 }
 
-loadEnvFile(envFile);
+const envFile = resolveEnvFile();
+if (
+  (!process.env.OPENPROJECT_URL || !process.env.OPENPROJECT_API_TOKEN) &&
+  existsSync(envFile)
+) {
+  loadEnvFile(envFile);
+}
 
 const baseUrl = process.env.OPENPROJECT_URL?.replace(/\/$/, "");
 const apiToken = process.env.OPENPROJECT_API_TOKEN;
 if (!baseUrl || !apiToken) {
   throw new Error(
-    `OPENPROJECT_URL and OPENPROJECT_API_TOKEN are required in ${envFile}`,
+    "OPENPROJECT_URL and OPENPROJECT_API_TOKEN are required either as " +
+      `environment variables or in ${envFile}`,
   );
 }
 const api = createOpenProjectApi(baseUrl, apiToken);
@@ -69,7 +74,7 @@ async function resolveProjectType(
   return selected.id;
 }
 
-const server = new McpServer({ name: "openproject", version: "0.2.0" });
+const server = new McpServer({ name: "openproject", version: "0.3.0" });
 
 server.registerTool(
   "list_projects",

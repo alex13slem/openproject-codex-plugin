@@ -1,8 +1,8 @@
 {
   "name": "openproject-codex-plugin",
-  "version": "0.2.0",
-  "private": true,
-  "description": "Codex plugin and MCP server for OpenProject API v3",
+  "version": "0.3.0",
+  "description": "Write-capable MCP server and Codex plugin for OpenProject API v3",
+  "mcpName": "io.github.alex13slem/openproject",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -10,11 +10,23 @@
   },
   "homepage": "https://github.com/alex13slem/openproject-codex-plugin#readme",
   "type": "module",
+  "bin": {
+    "openproject-mcp": "./dist/openproject-mcp.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "build": "bun build scripts/server.ts --target=node --outfile dist/openproject-mcp.js --banner '#!/usr/bin/env node'",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
-    "check": "bun run typecheck && bun run test"
+    "check": "bun run typecheck && bun run test",
+    "prepack": "bun run check && bun run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",

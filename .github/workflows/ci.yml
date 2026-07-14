@@ -37,6 +37,10 @@ jobs:
         working-directory: plugins/openproject
         run: bun run test
 
+      - name: Build distributable server
+        working-directory: plugins/openproject
+        run: bun run build
+
       - name: Check portable installer
         run: |
           bun scripts/install.ts --help
@@ -74,3 +78,4 @@ jobs:
           python3 -m json.tool .agents/plugins/marketplace.json >/dev/null
           python3 -m json.tool plugins/openproject/.codex-plugin/plugin.json >/dev/null
           python3 -m json.tool plugins/openproject/.mcp.json >/dev/null
+          python3 -m json.tool server.json >/dev/null

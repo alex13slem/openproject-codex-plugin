@@ -1,6 +1,6 @@
 {
   "name": "openproject",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Manage OpenProject work packages from Codex",
   "author": {
     "name": "alex13slem"
