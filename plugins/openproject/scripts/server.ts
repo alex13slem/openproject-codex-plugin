@@ -10,6 +10,7 @@ import {
   createOpenProjectApi,
   elements,
   type HalLink,
+  workPackageWebUrl,
 } from "./openproject-api.js";
 import { resolveEnvFile } from "./config.js";
 
@@ -145,7 +146,11 @@ server.registerTool(
       pageSize,
     });
     const collection = await api(path);
-    return result(elements(collection).map(compactWorkPackage));
+    return result(
+      elements(collection).map((workPackage) =>
+        compactWorkPackage(workPackage, baseUrl),
+      ),
+    );
   },
 );
 
@@ -190,7 +195,10 @@ server.registerTool(
         _links: links,
       }),
     });
-    return result(created);
+    return result({
+      ...created,
+      webUrl: workPackageWebUrl(baseUrl, created.id),
+    });
   },
 );
 
@@ -221,7 +229,10 @@ server.registerTool(
       method: "PATCH",
       body: JSON.stringify(body),
     });
-    return result(updated);
+    return result({
+      ...updated,
+      webUrl: workPackageWebUrl(baseUrl, updated.id),
+    });
   },
 );
 
@@ -240,7 +251,10 @@ server.registerTool(
       method: "POST",
       body: JSON.stringify({ comment: { format: "markdown", raw: comment } }),
     });
-    return result(activity);
+    return result({
+      ...activity,
+      workPackageUrl: workPackageWebUrl(baseUrl, id),
+    });
   },
 );
 

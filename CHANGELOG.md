@@ -5,6 +5,18 @@ All notable changes to this project are documented here. The project follows
 
 ## Unreleased
 
+### Changed
+
+- Clarified Community Edition compatibility and the project's write-capable
+  positioning relative to OpenProject's official MCP server.
+- Added a visual example workflow and refreshed the project banner.
+- Updated the roadmap after the v0.2.0 release.
+
+### Added
+
+- Direct OpenProject work-package URLs in compact search results and write
+  responses.
+
 ## 0.2.0 — 2026-07-14
 
 ### Added

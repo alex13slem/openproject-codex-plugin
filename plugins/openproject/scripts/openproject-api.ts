@@ -80,10 +80,12 @@ function linkedResource(resource: HalResource, key: string): HalLink | null {
 
 export function compactWorkPackage(
   resource: HalResource,
+  baseUrl: string,
 ): Record<string, unknown> {
   return {
     id: resource.id,
     subject: resource.subject,
+    url: workPackageWebUrl(baseUrl, resource.id),
     startDate: resource.startDate,
     dueDate: resource.dueDate,
     percentageDone: resource.percentageDone,
@@ -94,6 +96,14 @@ export function compactWorkPackage(
     assignee: linkedResource(resource, "assignee"),
     self: linkedResource(resource, "self"),
   };
+}
+
+export function workPackageWebUrl(
+  baseUrl: string,
+  id: number | undefined,
+): string | undefined {
+  if (!id) return undefined;
+  return `${baseUrl.replace(/\/$/, "")}/work_packages/${id}`;
 }
 
 export function buildWorkPackageSearchPath({
