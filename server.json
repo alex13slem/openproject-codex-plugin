@@ -2,19 +2,19 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.alex13slem/openproject",
   "title": "OpenProject",
-  "description": "Search, create, update, assign, comment on, and read attachments from OpenProject work packages.",
+  "description": "Manage OpenProject projects, work packages, attachments, relations, boards, users, watchers, and notifications.",
   "repository": {
     "url": "https://github.com/alex13slem/openproject-codex-plugin",
     "source": "github",
     "subfolder": "plugins/openproject"
   },
-  "version": "0.4.0",
+  "version": "0.5.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "openproject-codex-plugin",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "transport": {
         "type": "stdio"
       },
@@ -31,6 +31,37 @@
           "description": "OpenProject API token",
           "isRequired": true,
           "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "OPENPROJECT_PAGE_SIZE",
+          "description": "Default page size from 1 to 100",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string",
+          "default": "25"
+        },
+        {
+          "name": "OPENPROJECT_TIMEOUT_MS",
+          "description": "Request timeout in milliseconds from 1000 to 300000",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string",
+          "default": "30000"
+        },
+        {
+          "name": "OPENPROJECT_AUTH_MODE",
+          "description": "API-token authentication mode: basic for broad compatibility or bearer for OpenProject 17.2+",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string",
+          "default": "basic"
+        },
+        {
+          "name": "OPENPROJECT_ALLOWED_UPLOAD_DIRS",
+          "description": "Platform-separated directories from which attachment files may be read; defaults to the process working directory",
+          "isRequired": false,
+          "isSecret": false,
           "format": "string"
         }
       ]

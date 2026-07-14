@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import {
+  assertApiV3Path,
+  buildCollectionPath,
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
+  collectionResult,
   compact,
   compactAttachment,
   compactWorkPackage,
@@ -63,7 +66,9 @@ describe("createOpenProjectApi", () => {
 
     expect(requestUrl).toBe("https://tasks.example.com/api/v3/work_packages/42");
     expect(headers.get("Accept")).toBe("application/hal+json");
-    expect(headers.get("Authorization")).toBe("Bearer test-token");
+    expect(headers.get("Authorization")).toBe(
+      `Basic ${Buffer.from("apikey:test-token").toString("base64")}`,
+    );
     expect(result).toEqual({ id: 42, subject: "Ship it" });
   });
 
@@ -85,6 +90,26 @@ describe("createOpenProjectApi", () => {
 
     expect(new Headers(requestInit?.headers).get("Content-Type")).toBe(
       "application/json",
+    );
+  });
+
+  test("supports bearer authentication for newer OpenProject instances", async () => {
+    let requestInit: RequestInit | undefined;
+    const api = createOpenProjectApi(
+      "https://tasks.example.com",
+      "test-token",
+      async (_input, init) => {
+        requestInit = init;
+        return new Response("{}", { status: 200 });
+      },
+      30_000,
+      "bearer",
+    );
+
+    await api("/api/v3/users/me");
+
+    expect(new Headers(requestInit?.headers).get("Authorization")).toBe(
+      "Bearer test-token",
     );
   });
 
@@ -121,9 +146,38 @@ describe("createOpenProjectApi", () => {
     const headers = new Headers(requestInit?.headers);
 
     expect(headers.get("Accept")).toBe("*/*");
-    expect(headers.get("Authorization")).toBe("Bearer test-token");
+    expect(headers.get("Authorization")).toStartWith("Basic ");
     expect(downloaded.contentType).toBe("text/markdown");
     expect(new TextDecoder().decode(downloaded.bytes)).toBe("attachment body");
+  });
+
+  test("uploads attachment metadata and bytes as multipart form data", async () => {
+    let requestInit: RequestInit | undefined;
+    const api = createOpenProjectApi(
+      "https://tasks.example.com",
+      "test-token",
+      async (_input, init) => {
+        requestInit = init;
+        return new Response(JSON.stringify({ id: 5, fileName: "notes.md" }), {
+          status: 200,
+        });
+      },
+    );
+
+    const uploaded = await api.upload(
+      "/api/v3/work_packages/4/attachments",
+      "notes.md",
+      "text/markdown",
+      new TextEncoder().encode("hello"),
+      "Release notes",
+    );
+
+    const form = requestInit?.body as FormData;
+    expect(requestInit?.method).toBe("POST");
+    expect(form).toBeInstanceOf(FormData);
+    expect(form.get("file")).toBeInstanceOf(Blob);
+    expect(new Headers(requestInit?.headers).has("Content-Type")).toBe(false);
+    expect(uploaded).toEqual({ id: 5, fileName: "notes.md" });
   });
 
   test("rejects attachment downloads above the declared size limit", async () => {
@@ -281,6 +335,24 @@ describe("work package request builders", () => {
     ]);
   });
 
+  test("adds native filters, sorting, and pagination", () => {
+    const path = buildWorkPackageSearchPath({
+      filters: [{ field: "type", operator: "=", values: ["3"] }],
+      sortBy: [["updatedAt", "desc"]],
+      offset: 2,
+      pageSize: 25,
+    });
+    const url = new URL(path, "https://tasks.example.com");
+
+    expect(url.searchParams.get("offset")).toBe("2");
+    expect(JSON.parse(url.searchParams.get("sortBy") ?? "[]")).toEqual([
+      ["updatedAt", "desc"],
+    ]);
+    expect(JSON.parse(url.searchParams.get("filters") ?? "[]")).toEqual([
+      { type: { operator: "=", values: ["3"] } },
+    ]);
+  });
+
   test("builds optimistic-lock update payloads", () => {
     expect(
       buildWorkPackageUpdatePayload(9, {
@@ -300,5 +372,40 @@ describe("work package request builders", () => {
         status: { href: "/api/v3/statuses/2" },
       },
     });
+  });
+});
+
+describe("collection helpers", () => {
+  test("builds native OpenProject collection parameters", () => {
+    const path = buildCollectionPath("/api/v3/users", {
+      filters: [{ field: "name", operator: "~", values: ["Alex"] }],
+      sortBy: [["name", "asc"]],
+      offset: 2,
+      pageSize: 10,
+    });
+    const url = new URL(path, "https://tasks.example.com");
+
+    expect(url.searchParams.get("offset")).toBe("2");
+    expect(url.searchParams.get("pageSize")).toBe("10");
+    expect(JSON.parse(url.searchParams.get("filters") ?? "[]")).toEqual([
+      { name: { operator: "~", values: ["Alex"] } },
+    ]);
+  });
+
+  test("reports pagination and validates safe passthrough paths", () => {
+    expect(collectionResult({ total: 25, count: 10, offset: 2, pageSize: 10 })).toEqual({
+      total: 25,
+      count: 10,
+      offset: 2,
+      pageSize: 10,
+      hasMore: true,
+    });
+    expect(assertApiV3Path("/api/v3/queries/42?pageSize=5")).toBe(
+      "/api/v3/queries/42?pageSize=5",
+    );
+    expect(() => assertApiV3Path("//evil.example/api/v3/users")).toThrow();
+    expect(() => assertApiV3Path("/api/v3/../users")).toThrow();
+    expect(() => assertApiV3Path("/api/v30/users")).toThrow();
+    expect(() => assertApiV3Path("/api/v3/%2e%2e/users")).toThrow();
   });
 });

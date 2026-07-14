@@ -3,6 +3,28 @@
 All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.5.0 — 2026-07-14
+
+### Added
+
+- Project create, read, update, delete, filtering, pagination, and count tools.
+- Work-package activity history, deletion, native filters, sorting, pagination,
+  scheduling, estimates, progress, hierarchy, versions, and responsibility.
+- Relation, watcher, user, available-assignee, notification, board, and
+  reference-data tools.
+- Attachment uploads and deletion with allowlisted local paths, symlink
+  resolution, and explicit size controls.
+- A restricted read-only escape hatch for relative OpenProject API v3 paths.
+- Request timeout, default page-size, and authentication-mode configuration.
+
+### Changed
+
+- API-token authentication now defaults to broadly compatible Basic auth;
+  Bearer auth remains available with `OPENPROJECT_AUTH_MODE=bearer`.
+- Collection responses now include consistent pagination metadata and a
+  `hasMore` indicator.
+- GitHub workflows use the Node.js 24-based checkout action.
+
 ## 0.4.0 — 2026-07-14
 
 ### Added

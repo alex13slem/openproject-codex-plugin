@@ -11,21 +11,23 @@ administrative capabilities.
 - Clickable OpenProject URLs in search and write results.
 - Unit tests for API authentication, filters, updates, and errors.
 
-## Next release — Safer discovery and richer task workflows
+## Released in v0.5.0
 
-- [ ] List available work-package statuses, priorities, and types.
-- [ ] Find users and assignees by name.
-- [ ] Add pagination for projects and work packages.
-- [ ] Improve structured API error messages.
+- Project CRUD, native filtering, sorting, pagination, and count tools.
+- Work-package activities, deletion, scheduling, estimates, progress,
+  hierarchy, responsibility, and versions.
+- Attachment uploads and deletion, relations, watchers, notifications, boards,
+  users, available assignees, and reference data.
+- Request timeout and authentication-mode controls.
+- Restricted GET-only API v3 passthrough for uncommon read workflows.
 
 ## Later
 
 - Optional read-only mode.
-- Date, estimate, and progress updates.
-- Work-package relationships and hierarchy.
 - Integration tests against a disposable OpenProject instance.
 - Automated release notes and version synchronization.
 - OAuth support for centrally administered, multi-user deployments.
+- Board card movement after validating behavior across free and action boards.
 
 Roadmap items are proposals, not commitments. Open an issue to discuss new
 capabilities before starting a substantial implementation.
