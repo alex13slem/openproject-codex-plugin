@@ -5,13 +5,21 @@
 Create the default file and restrict its permissions:
 
 ```bash
-mkdir -p ~/.config/codex
-cp .env.example ~/.config/codex/openproject.env
-chmod 600 ~/.config/codex/openproject.env
+mkdir -p ~/.codex
+cp .env.example ~/.codex/openproject.env
+chmod 600 ~/.codex/openproject.env
 ```
 
-If you use another location, reinstall with
-`OPENPROJECT_ENV_FILE=/absolute/path/to/openproject.env`.
+On Windows, create the same file in PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force (Join-Path $HOME ".codex")
+Copy-Item .env.example (Join-Path $HOME ".codex\openproject.env")
+```
+
+If you use another location, reinstall with `--env-file` followed by its
+absolute path. Existing `~/.config/codex/openproject.env` files continue to be
+detected on macOS and Linux.
 
 ## OpenProject returns 401 or 403
 
@@ -27,6 +35,8 @@ Run the installer again and start a new Codex thread:
 ```bash
 ./scripts/install.sh
 ```
+
+On Windows, run `./scripts/install.ps1` from PowerShell instead.
 
 Then verify that `openproject` appears in the configured MCP servers for your
 Codex installation.

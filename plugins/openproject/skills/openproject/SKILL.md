@@ -19,6 +19,9 @@ Use the `openproject` MCP tools for OpenProject work.
 
 1. Use `list_projects` to resolve a project name or identifier.
 2. Use `search_work_packages` or `get_work_package` to inspect existing work.
+   Search can be narrowed by project, assignee, exact due date, and either an
+   exact status or the open/closed status category. Use `assignedToMe` for the
+   authenticated user's work packages.
 3. Use `create_work_package` for new tasks. Omit `typeId` to select the project's `Task` type automatically.
 4. Use `update_work_package` for field changes.
 5. Use `add_work_package_comment` for progress notes and follow-ups.

@@ -9,8 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -31,6 +36,35 @@ jobs:
       - name: Test
         working-directory: plugins/openproject
         run: bun run test
+
+      - name: Check portable installer
+        run: |
+          bun scripts/install.ts --help
+          bun scripts/uninstall.ts --help
+
+      - name: Check PowerShell syntax
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $failures = 0
+          foreach ($file in @("scripts/install.ps1", "scripts/uninstall.ps1")) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Write-Error
+              $failures++
+            }
+          }
+          if ($failures -gt 0) { exit 1 }
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Check shell syntax
         run: bash -n scripts/install.sh scripts/uninstall.sh

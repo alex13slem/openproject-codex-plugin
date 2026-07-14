@@ -1,6 +1,4 @@
 import { readFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -8,14 +6,14 @@ import {
   buildWorkPackageSearchPath,
   buildWorkPackageUpdatePayload,
   compact,
+  compactWorkPackage,
   createOpenProjectApi,
   elements,
   type HalLink,
 } from "./openproject-api.js";
+import { resolveEnvFile } from "./config.js";
 
-const envFile =
-  process.env.OPENPROJECT_ENV_FILE ??
-  join(homedir(), ".config", "codex", "openproject.env");
+const envFile = resolveEnvFile();
 
 function loadEnvFile(path: string): void {
   const source = readFileSync(path, "utf8");
@@ -70,7 +68,7 @@ async function resolveProjectType(
   return selected.id;
 }
 
-const server = new McpServer({ name: "openproject", version: "0.1.0" });
+const server = new McpServer({ name: "openproject", version: "0.2.0" });
 
 server.registerTool(
   "list_projects",
@@ -98,18 +96,56 @@ server.registerTool(
 server.registerTool(
   "search_work_packages",
   {
-    description: "Search visible OpenProject work packages by subject and optional project ID.",
+    description: "Search visible OpenProject work packages by subject, project, assignee, exact due date, and status.",
     inputSchema: {
       query: z.string().optional().describe("Subject text fragment"),
       projectId: z.number().int().positive().optional(),
+      assigneeId: z.number().int().positive().optional(),
+      assignedToMe: z.boolean().default(false),
+      dueDate: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional()
+        .describe("Exact due date in YYYY-MM-DD format"),
+      statusId: z.number().int().positive().optional(),
+      statusCategory: z.enum(["open", "closed"]).optional(),
       pageSize: z.number().int().min(1).max(200).default(50),
     },
     annotations: { readOnlyHint: true },
   },
-  async ({ query, projectId, pageSize }) => {
-    const path = buildWorkPackageSearchPath({ query, projectId, pageSize });
+  async ({
+    query,
+    projectId,
+    assigneeId,
+    assignedToMe,
+    dueDate,
+    statusId,
+    statusCategory,
+    pageSize,
+  }) => {
+    if (assigneeId && assignedToMe) {
+      throw new Error("Use either assigneeId or assignedToMe, not both");
+    }
+    if (statusId && statusCategory) {
+      throw new Error("Use either statusId or statusCategory, not both");
+    }
+    const currentUser = assignedToMe
+      ? await api("/api/v3/users/me")
+      : undefined;
+    if (assignedToMe && !currentUser?.id) {
+      throw new Error("OpenProject did not return the current user ID");
+    }
+    const path = buildWorkPackageSearchPath({
+      query,
+      projectId,
+      assigneeId: currentUser?.id ?? assigneeId,
+      dueDate,
+      statusId,
+      statusCategory,
+      pageSize,
+    });
     const collection = await api(path);
-    return result(elements(collection).map(compact));
+    return result(elements(collection).map(compactWorkPackage));
   },
 );
 

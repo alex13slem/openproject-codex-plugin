@@ -6,6 +6,9 @@ export type HalResource = Record<string, unknown> & {
   name?: string;
   identifier?: string;
   lockVersion?: number;
+  startDate?: string | null;
+  dueDate?: string | null;
+  percentageDone?: number | null;
   _links?: Record<string, HalLink | HalLink[]>;
   _embedded?: { elements?: HalResource[] };
 };
@@ -70,19 +73,66 @@ export function compact(resource: HalResource): Record<string, unknown> {
   };
 }
 
+function linkedResource(resource: HalResource, key: string): HalLink | null {
+  const link = resource._links?.[key];
+  return link && !Array.isArray(link) ? link : null;
+}
+
+export function compactWorkPackage(
+  resource: HalResource,
+): Record<string, unknown> {
+  return {
+    id: resource.id,
+    subject: resource.subject,
+    startDate: resource.startDate,
+    dueDate: resource.dueDate,
+    percentageDone: resource.percentageDone,
+    project: linkedResource(resource, "project"),
+    type: linkedResource(resource, "type"),
+    status: linkedResource(resource, "status"),
+    priority: linkedResource(resource, "priority"),
+    assignee: linkedResource(resource, "assignee"),
+    self: linkedResource(resource, "self"),
+  };
+}
+
 export function buildWorkPackageSearchPath({
   query,
   projectId,
+  assigneeId,
+  dueDate,
+  statusId,
+  statusCategory,
   pageSize,
 }: {
   query?: string;
   projectId?: number;
+  assigneeId?: number;
+  dueDate?: string;
+  statusId?: number;
+  statusCategory?: "open" | "closed";
   pageSize: number;
 }): string {
   const filters: Record<string, unknown>[] = [];
   if (query) filters.push({ subject: { operator: "~", values: [query] } });
   if (projectId) {
     filters.push({ project: { operator: "=", values: [String(projectId)] } });
+  }
+  if (assigneeId) {
+    filters.push({ assignee: { operator: "=", values: [String(assigneeId)] } });
+  }
+  if (dueDate) {
+    filters.push({ dueDate: { operator: "=d", values: [dueDate] } });
+  }
+  if (statusId) {
+    filters.push({ status: { operator: "=", values: [String(statusId)] } });
+  } else if (statusCategory) {
+    filters.push({
+      status: {
+        operator: statusCategory === "open" ? "o" : "c",
+        values: [],
+      },
+    });
   }
   const params = new URLSearchParams({ pageSize: String(pageSize) });
   if (filters.length) params.set("filters", JSON.stringify(filters));

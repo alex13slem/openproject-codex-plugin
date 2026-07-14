@@ -14,9 +14,11 @@ change so the approach can be discussed first.
    bun run check
    ```
 
-3. Check shell scripts from the repository root:
+3. Check the portable installer and Unix wrappers from the repository root:
 
    ```bash
+   bun scripts/install.ts --help
+   bun scripts/uninstall.ts --help
    bash -n scripts/install.sh scripts/uninstall.sh
    ```
 

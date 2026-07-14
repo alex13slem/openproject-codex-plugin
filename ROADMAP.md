@@ -7,7 +7,7 @@ administrative capabilities.
 
 - [ ] List available work-package statuses, priorities, and types.
 - [ ] Find users and assignees by name.
-- [ ] Filter work packages by status and assignee.
+- [x] Filter work packages by status and assignee.
 - [ ] Return clickable OpenProject URLs in compact tool results.
 - [ ] Add pagination for projects and work packages.
 - [ ] Improve structured API error messages.
