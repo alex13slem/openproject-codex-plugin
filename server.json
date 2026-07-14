@@ -1,0 +1,39 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.alex13slem/openproject",
+  "title": "OpenProject",
+  "description": "Search, create, update, assign, and comment on OpenProject work packages.",
+  "repository": {
+    "url": "https://github.com/alex13slem/openproject-codex-plugin",
+    "source": "github",
+    "subfolder": "plugins/openproject"
+  },
+  "version": "0.3.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "openproject-codex-plugin",
+      "version": "0.3.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "OPENPROJECT_URL",
+          "description": "Root URL of the OpenProject instance",
+          "isRequired": true,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "OPENPROJECT_API_TOKEN",
+          "description": "OpenProject API token",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

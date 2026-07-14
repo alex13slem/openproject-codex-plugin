@@ -78,6 +78,15 @@ git clone https://github.com/alex13slem/openproject-codex-plugin.git
 cd openproject-codex-plugin
 ```
 
+MCP clients that support npm packages can instead run the server with
+`npx -y openproject-codex-plugin` and pass `OPENPROJECT_URL` and
+`OPENPROJECT_API_TOKEN` as environment variables.
+
+The standalone server is published under
+`io.github.alex13slem/openproject` in the official MCP Registry. Marketplace
+installations use the same API permissions and security boundaries as the
+local installer.
+
 ### macOS and Linux
 
 Create a private environment file:
